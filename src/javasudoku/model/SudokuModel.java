@@ -19,9 +19,8 @@ public class SudokuModel extends Observable {
     private String playerName;
     
     //TODO: Instantiate all the necessary objects & provide all the functionality for the necessary objects
-    public SudokuModel(String playerName) {
+    public SudokuModel() {
         this.generator = new SudokuGenerator();
-        this.playerName = playerName;
     }
     
     /**
@@ -126,6 +125,10 @@ public class SudokuModel extends Observable {
     public void importGame(SudokuGame game) {
         setPlayerName(game.playerName);
         this.board = game.boardState;
+        
+        //Update observers, notify them about the new board state
+        setChanged();
+        notifyObservers(this.getBoard());
     }
     
     /**
@@ -135,7 +138,10 @@ public class SudokuModel extends Observable {
      * state of this class
      */
     public SudokuGame exportGame() {
-        return new SudokuGame(getPlayerName(), getBoard());
+        SudokuGame exportedGame = new SudokuGame(getPlayerName(), getBoard());
+        exportedGame.saveLastPlayedDate(); //Set the date
+        
+        return exportedGame;
     }
     
     /**
@@ -156,7 +162,7 @@ public class SudokuModel extends Observable {
      * @return True if a player name has been assigned, false if not
      */
     public boolean hasValidPlayer() {
-        return playerName != null;
+        return playerName != null && !playerName.isEmpty();
     }
     
     

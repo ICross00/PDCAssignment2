@@ -17,7 +17,7 @@ public class SudokuApp {
     public static void main(String[] args) {
        SudokuDBManager dbmanage = SudokuDBManager.getInstance();
 
-       SudokuModel model = new SudokuModel("test");
+       SudokuModel model = new SudokuModel();
        SudokuView view = new SudokuView();
        SudokuController controller = new SudokuController(model, view);
        controller.connectModelView();

@@ -154,10 +154,19 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
         this.playerName.setText("Player: " + name);
     }
     
+    /**
+     * Sets whether or not the cells in the board panel can be edited
+     * @param activated True to allow editing, false to disable
+     */
+    public void activateBoard(boolean activated) {
+        sudokuBoardPanel.setActive(activated);
+    }
+    
     @Override
     public void update(Observable o, Object arg) {
         //Receive a SudokuBoard object
         if(arg instanceof javasudoku.model.SudokuBoard) {
+            
             //Use the received SudokuBoard object to extract the board data
             SudokuBoard boardObj = (SudokuBoard)arg;
             SudokuCell[][] boardArray = boardObj.getBoard();

@@ -175,6 +175,6 @@ public class BoardPanel extends javax.swing.JPanel {
      */
     public void setActive(boolean active) {
         for(SubgridPanel subgrid: subgrids)
-            subgrid.setActive(false);
+            subgrid.setActive(active);
     }
 }

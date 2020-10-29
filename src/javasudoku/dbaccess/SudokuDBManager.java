@@ -10,7 +10,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javasudoku.model.SudokuGame;
 import javasudoku.model.SudokuStringifier;
-import java.time.format.DateTimeFormatter;  
 
 /**
  * Initializes and maintains a connection with a database used to store SudokuGame objects.
