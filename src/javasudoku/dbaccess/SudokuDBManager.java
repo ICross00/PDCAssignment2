@@ -3,6 +3,7 @@ package javasudoku.dbaccess;
 import javasudoku.model.SudokuGameDAO;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,7 +11,6 @@ import java.util.ArrayList;
 import javasudoku.model.SudokuGame;
 import javasudoku.model.SudokuStringifier;
 import java.time.format.DateTimeFormatter;  
-import java.time.LocalDateTime;  
 
 /**
  * Initializes and maintains a connection with a database used to store SudokuGame objects.
@@ -105,46 +105,58 @@ public class SudokuDBManager implements SudokuGameDAO {
          
      /**
       * Runs an SQL query on the Sudoku database
-      * @param sqlString The SQL to run on the database
+      * @param statement The SQL to run on the database
       * @return A ResultSet object containing any matches for the query, or null if the query failed
       */
-    private ResultSet runQuery(String sqlString) {
+    private ResultSet runQuery(PreparedStatement statement) {
         ResultSet results = null;
     
         try {
-            Statement sqlStatement = dbConnection.createStatement();
-            results = sqlStatement.executeQuery(sqlString);
+            results = statement.executeQuery();
         } catch (SQLException se) {
-            System.out.println("Failed to run query: " + sqlString);
+            System.out.println("Failed to run query: " + statement);
         }
         
         return results;
     }
     
-    /**
-     * Runs an SQL update statement on the Sudoku database. This will modify the database.
-     * @param sqlString The SQL to run on the database
-     */
-    private void runUpdate(String sqlString) {
-
-        try {
-            Statement sqlStatement = dbConnection.createStatement();
-            sqlStatement.executeUpdate(sqlString);
-        } catch (SQLException se) {
-            System.out.println("Failed to run update: " + sqlString);
-            System.out.println(se.getMessage());
-            System.out.println(se.getNextException().getMessage());
-        }
-    }
     
     /**
      * Retrieves a game from the database according to its UID
-     * @param id 
-     * @return 
+     * @param id The ID to search for in the database
+     * @return a SudokuGame object representing the game that was found, or null if none was found
      */
     @Override
     public SudokuGame getGame(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SudokuGame result = null;
+        
+        try {
+            //Create the SQL statement
+            PreparedStatement sql = dbConnection.prepareStatement("SELECT * FROM " + TABLE_NAME + " WHERE UID = ?");
+            sql.setInt(1, id);
+
+            ResultSet query = sql.executeQuery();
+            
+            //Process the results to initialize a SudokuGame object
+            if(query.next()) {
+                String saveDate = query.getString("SaveDate");
+                String playerName = query.getString("PlayerName");
+                String boardData = query.getString("GameData");
+                
+                //Create the object by parsing the raw board data and setting the date manually
+                result = new SudokuGame(playerName, SudokuStringifier.parseBoard(boardData));
+                result.setDate(saveDate);
+            } else {
+                //Throw an exception if there was no game with the provided ID
+                throw new SQLException();
+            }
+            
+        } catch (SQLException se) {
+            System.out.println("Failed to remove game with UID " + id);
+            System.out.println(se);
+        }
+        
+        return result;
     }
     
     /**
@@ -154,7 +166,35 @@ public class SudokuDBManager implements SudokuGameDAO {
      */
     @Override
     public ArrayList<SudokuGame> getGamesByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<SudokuGame> results = new ArrayList<>();
+        
+        try {
+            //Create the SQL statement
+            PreparedStatement sql = dbConnection.prepareStatement("SELECT * FROM " + TABLE_NAME + " WHERE PlayerName LIKE ?");
+            sql.setString(1, name);
+
+            ResultSet query = sql.executeQuery();
+            
+            //Iterate over all of the results
+            while(query.next()) {
+                String saveDate = query.getString("SaveDate");
+                String playerName = query.getString("PlayerName");
+                String boardData = query.getString("GameData");
+                
+                //Create the object by parsing the raw board data and setting the date manually
+                SudokuGame resultGame = new SudokuGame(playerName, SudokuStringifier.parseBoard(boardData));
+                resultGame.setDate(saveDate);
+                
+                //Add the result to the arraylist
+                results.add(resultGame);
+            }
+            
+        } catch (SQLException se) {
+            System.out.println("Failed to run query when supplied name " + name);
+            System.out.println(se);
+        }
+        
+        return results;
     }
     
     /**
@@ -163,34 +203,54 @@ public class SudokuDBManager implements SudokuGameDAO {
      */
     @Override
     public void addGame(SudokuGame game) {
-        //Get the current date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-        LocalDateTime curTime = LocalDateTime.now();  
-        String dateAsString = formatter.format(curTime);
-        
-        //Get the current completion status
+        //Get the game, completion status, and the board data
+        String dateAsString = game.lastPlayedDate;
         float completion = game.completionPercentage;
-        
-        //Get the board formatted as a string
         String boardData = SudokuStringifier.boardToString(game.boardState);
 
         //Create the SQL statement
-        String sql = "INSERT INTO " + TABLE_NAME + "(SaveDate, FilledCells, PlayerName, GameData) VALUES ("
-                + "'" + dateAsString + "',"
-                + "" + completion + ","
-                + "'" + game.playerName + "',"
-                + "'" + boardData + "')";
-        
-        runUpdate(sql);
-    }
+        try {
+            PreparedStatement sql = dbConnection.prepareStatement(
+                    "INSERT INTO " + TABLE_NAME + " (SaveDate, FilledCells, PlayerName, GameData) VALUES ("
+                            + "?,?,?,?)");
 
+            //Append the parameters
+            sql.setString(1, dateAsString);
+            sql.setFloat(2, completion);
+            sql.setString(3, game.playerName);
+            sql.setString(4, boardData);
+
+            //Run the update
+            sql.executeUpdate();
+        } catch (SQLException se) {
+            System.out.println("Failed to add game to table");
+            System.out.println(se);
+        }
+    }
+    
+    /**
+     * Removes an existing game from the database
+     * @param id The ID of the game to remove
+     */
     @Override
     public void removeGame(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            //Create the SQL statement
+            PreparedStatement sql = dbConnection.prepareStatement(
+                    "REMOVE FROM " + TABLE_NAME + " WHERE UID = ?");
+            sql.setInt(1, id);
+
+            sql.executeUpdate();
+        } catch (SQLException se) {
+            System.out.println("Failed to remove game with UID " + id);
+            System.out.println(se);
+        }
     }
 
     @Override
     public void updateGame(int id, SudokuGame newBoard) {
+        //Remove the game with the existing ID, then add the new game
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

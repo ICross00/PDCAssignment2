@@ -84,6 +84,19 @@ public class SudokuBoard {
     }
     
     /**
+     * Checks if the entire board is empty
+     * @return True if the board is empty, false otherwise
+     */
+    public boolean isEmpty() {
+        //Iterate over only the first 3 collections in the arraylist, as these comprise every cell on the board
+        for(SudokuCollection c: collections.subList(0, SUBGRID_COUNT))
+            if(!c.testCollectionEmpty())
+                return false;
+        
+        return true;
+    }
+    
+    /**
      * Gets the cell at a given position
      * @param position The position of the desired cell
      * @return The cell at the given position

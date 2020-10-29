@@ -10,20 +10,12 @@ import javasudoku.model.SudokuBoard;
 import javasudoku.model.SudokuCoordinate;
 import javasudoku.model.SudokuModel;
 import javasudoku.view.CellPanel;
-import javasudoku.view.NameDifficultyDialog;
+import javasudoku.view.NumberSliderDialog;
 import javasudoku.view.YesNoDialog;
 import javasudoku.view.SudokuView;
-import javasudoku.view.GameOptions;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
-
-/**
- * TODO:
- * Implement the rest of the DAO functions in SudokuDBManager
- * Relegate some of the functionality in this class (event listeners, etc) into other classes
- * within this package if possible
- */
 
 /**
  * Connects a SudokuModel and SudokuView instance
@@ -68,12 +60,48 @@ public class SudokuController {
             view.dispose();
         });
         
+        //Show Solution button clicked
+        view.showSolButton.addActionListener((ActionEvent e) -> {
+            requestShowSolution();
+        });
+        
+        view.changeUserButton.addActionListener((ActionEvent e) -> {
+            requestChangeUser();
+        });
+        
         //Setup listener for when cells are clicked
         Toolkit.getDefaultToolkit().addAWTEventListener(new OnCellClicked(), 
                 AWTEvent.MOUSE_EVENT_MASK);
         
         //Setup listener for when a cell value is changed
         this.boardInputListener = new OnCellValueUpdated();
+    }
+    
+    /**
+     * Prompts the user with a dialog asking if they wish to view
+     * the solution of the game
+     */
+    private void requestShowSolution() {
+        //Prompt show solution
+        boolean reveal = YesNoDialog.prompt("Reveal the solution? The game will not be saved.", "Show Solution");
+        
+        //Solve the board
+        if(reveal)
+            model.solveBoard();
+    }
+    
+    private void requestChangeUser() {
+        //Prompt the user to enter their desired name
+        String nextName = promptEnterName();
+        if(nextName != null) {
+            //If there is a game in progress, prompt the user to save
+            if(!model.isBoardEmpty()) {
+                requestSaveGame();
+            }
+        
+            model.startEmptyBoard();
+            model.setPlayerName(nextName);
+        }
     }
     
     /**
@@ -96,27 +124,52 @@ public class SudokuController {
     }
     
     /**
+     * Prompts the user to enter their name 
+     * @return The name that the user entered, or null if 
+     * the user either canceled the operation or entered an empty name
+     */
+    private String promptEnterName() {
+        //Get user name and desired difficulty using dialogs
+        String name = JOptionPane.showInputDialog(null, "Please enter your name (max 30 characters)", 
+                "Enter Name", JOptionPane.INFORMATION_MESSAGE);
+       
+        if(name.isEmpty()) { //If the name is empty, display an error
+            JOptionPane.showMessageDialog(null, "Please enter a valid name.", 
+                    "Error", JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        }
+        
+        return name;
+    }
+    /**
      * Prompts the user to start a new Sudoku game
      * The user will be prompted to enter their name and the desired difficulty of the puzzle
      * If a game is already in progress, the user will be asked if they wish to save their game
      */
     private void requestStartNewGame() {
         //Check if a game is already in progress
-        if(model.isGameActive()) {
+        if(!model.isBoardEmpty()) {
             requestSaveGame();
         }
+        
+        //Prompt the user to enter their name if no name has been entered
+        if(!model.hasValidPlayer()) { 
+            String name = promptEnterName();
+            if(name == null)    //Do nothing if the user canceled or did not enter a valid name
+                return;
 
-        GameOptions response = NameDifficultyDialog.prompt(); //Get user name and desired difficulty using a dialog
-        if(response == null) //If the user clicked cancel, do nothing
+            //Start the game
+            view.playerName.setText("Player: " + name); //Update the display label
+            model.setPlayerName(name);
+        }
+        
+        Integer difficulty = NumberSliderDialog.prompt("Please select a difficulty (0 easiest, 100 hardest)", 
+                "Difficulty Select", 0, 100); 
+        
+        if(difficulty == null) //If the user clicked cancel, do nothing
             return;
 
-        if(!response.name.isEmpty()) { //Start the game
-            model.setPlayerName(response.name);
-            model.startPuzzle(response.difficulty);
-            view.playerName.setText("Player: " + response.name); //Update the display label
-        } else { //If the user did not enter a valid name, display an error prompt
-            JOptionPane.showMessageDialog(null, "Please enter a valid name.", "Error", JOptionPane.INFORMATION_MESSAGE);
-        }
+        model.startPuzzle(difficulty);
     }
     
     /**
@@ -138,7 +191,7 @@ public class SudokuController {
     
     /**
      * Class to handle the selection of text fields, as well as keeping track
-     * of which text field the user has selected
+     * of which text field the user has selected by listening to mouse events
      */
     private class OnCellClicked implements AWTEventListener {
         @Override
@@ -164,7 +217,8 @@ public class SudokuController {
     
     /**
      * Class to handle user input via text fields, and the corresponding
-     * updates needed to be done on the underlying model
+     * updates needed to be done on the underlying model. The update function
+     * of this class is run every time the value inside a cell is changed
      */
     private class OnCellValueUpdated implements SimpleDocumentListener {
 

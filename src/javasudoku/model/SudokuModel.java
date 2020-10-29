@@ -14,7 +14,7 @@ import java.util.Observable;
  */
 public class SudokuModel extends Observable {
 
-    SudokuBoard board;
+    private SudokuBoard board;
     private final SudokuGenerator generator;
     private String playerName;
     
@@ -30,6 +30,17 @@ public class SudokuModel extends Observable {
      */
     public boolean isGameActive() {
         return this.board != null;
+    }
+    
+    /**
+     * Returns whether or not the board is empty or uninitialized
+     * @return True if the board is empty or uninitialized, false if not
+     */
+    public boolean isBoardEmpty() {
+        if(this.board == null)
+            return true;
+        
+        return this.board.isEmpty();
     }
     
     /**
@@ -140,11 +151,23 @@ public class SudokuModel extends Observable {
     public String getPlayerName() {
         return playerName;
     }
-
+    
+    /**
+     * @return True if a player name has been assigned, false if not
+     */
+    public boolean hasValidPlayer() {
+        return playerName != null;
+    }
+    
+    
     /**
      * @param playerName The current player name to set
      */
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
+        
+        //Update observers, notify them about the new player name
+        setChanged();
+        notifyObservers(playerName);
     }
 }

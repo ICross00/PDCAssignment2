@@ -146,9 +146,17 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
     public javasudoku.view.BoardPanel sudokuBoardPanel;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Sets the name displayed by the playerName label
+     * @param name The name to set
+     */
+    private void setPlayerName(String name) {
+        this.playerName.setText("Player: " + name);
+    }
+    
     @Override
     public void update(Observable o, Object arg) {
-        //TODO: Make the SudokuBoardPanel represent the model
+        //Receive a SudokuBoard object
         if(arg instanceof javasudoku.model.SudokuBoard) {
             //Use the received SudokuBoard object to extract the board data
             SudokuBoard boardObj = (SudokuBoard)arg;
@@ -167,9 +175,10 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
                 y++;
             }
         }
-    }
-    
-    public JButton getQuitButton() {
-        return quitButton;
+        //Receive a player name string
+        else if(arg instanceof String) {
+            //Update the player name label
+            setPlayerName((String)arg);
+        }
     }
 }

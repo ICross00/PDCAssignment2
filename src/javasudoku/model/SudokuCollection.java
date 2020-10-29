@@ -74,6 +74,20 @@ public abstract class SudokuCollection {
     }
     
     /**
+     * Checks if the collection is empty, i.e. that all of the values are 0
+     * @return True if the collection was empty, false if not
+     */
+    public boolean testCollectionEmpty() {
+        for(SudokuCell cell: collection) {
+            int cellValue = cell.getCellValue();
+            if(cellValue != 0)
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /**
      * Checks if the collection is complete, i.e. that it contains all of the
      * values 1 through 9
      * @return True if the collection contains all values 1-9, false if not
