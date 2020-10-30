@@ -28,8 +28,9 @@ class CellPanelEventController implements AWTEventListener, SimpleDocumentListen
     
     private CellPanel activePanel;
     private JTextField activeField;
+    private final BoardSolvedListener solveCallback;
     
-    public CellPanelEventController(SudokuView view, SudokuModel model) {
+    public CellPanelEventController(SudokuView view, SudokuModel model, BoardSolvedListener solveCallback) {
         this.view = view;
         this.model = model;
         
@@ -38,6 +39,8 @@ class CellPanelEventController implements AWTEventListener, SimpleDocumentListen
         
         //Begin listening to mouse events, so that we can determine what cells were clicked
         Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.MOUSE_EVENT_MASK);
+        //Register the solved callback
+        this.solveCallback = solveCallback;
     }
     
     /**
@@ -116,8 +119,14 @@ class CellPanelEventController implements AWTEventListener, SimpleDocumentListen
                 int userValue = activePanel.getValue(); //get the value the user entered
                 //Update the underlying model
                 boolean couldPlace = modelBoard.setCell(selectedCoord, userValue);
+                
                 //Display the number as red if it was not a valid placement
                 activePanel.setValid(couldPlace);
+                
+                //If the board is solved, trigger the solved callback
+                if(modelBoard.isSolved())
+                    solveCallback.onBoardSolved();
+                
             } catch (NumberFormatException ex) {
                 System.out.println("Text field at " + selectedCoord + " contains an unexpected value");
                 activeField.setText(""); //Clear the text if invalid input somehow occurs

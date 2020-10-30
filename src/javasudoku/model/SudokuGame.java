@@ -15,6 +15,7 @@ public final class SudokuGame {
     public final SudokuBoard boardState;
     public final float completionPercentage;
     public String lastPlayedDate;
+    public boolean isSolved;
     
     public SudokuGame(String playerName, SudokuBoard boardState) {
         this.playerName = playerName;

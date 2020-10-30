@@ -183,4 +183,13 @@ public class SubgridPanel extends javax.swing.JPanel {
         for(CellPanel cell: cells)
             cell.setActive(active);
     }
+    
+    /**
+     * Resets the text colour for all of the cells in the subgrid to clear
+     * invalid placements
+     */
+    void setValid() {
+        for(CellPanel cell: cells)
+            cell.setValid(true);
+    }
 }

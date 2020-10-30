@@ -6,7 +6,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import javasudoku.model.SudokuGame;
 import javasudoku.model.SudokuStringifier;
@@ -24,6 +23,7 @@ public class SudokuDBManager implements SudokuGameDAO {
     private static final String PASS = "pdc";
     private static final String URL = "jdbc:derby:SudokuDB;create=true";
     private static final String TABLE_NAME = "SudokuGames";
+    public static final int MAX_NAME_LENGTH = 15;
     
     //Instance information
     private static SudokuDBManager dbManagerInstance = null;
@@ -85,20 +85,21 @@ public class SudokuDBManager implements SudokuGameDAO {
       */
      private void initializeTable() {
          try {
-             String updateStr = "CREATE TABLE " + TABLE_NAME + " ("
+             PreparedStatement sql = dbConnection.prepareStatement("CREATE TABLE " + TABLE_NAME + " ("
                      + "UID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
                      + "SaveDate VARCHAR(50) NOT NULL,"
                      + "FilledCells FLOAT,"
-                     + "PlayerName VARCHAR(50) NOT NULL,"
+                     + "PlayerName VARCHAR(" + MAX_NAME_LENGTH + ") NOT NULL,"
                      + "GameData VARCHAR(500) NOT NULL,"
-                     + "PRIMARY KEY (UID))";
+                     + "PRIMARY KEY (UID))");
              
-             Statement sqlStatement = dbConnection.createStatement();
-             sqlStatement.executeUpdate(updateStr);
+             sql.executeUpdate();
          } catch (SQLException se) {
              //Error code XOY32 means that the table already existed, so no error needs to be thrown in such a case
-             if(!se.getSQLState().equals("X0Y32"))
+             if(!se.getSQLState().equals("X0Y32")) {
                  System.out.println("Failed to initialize tables.");
+                 System.out.println(se.getMessage());
+             }
          }
      }
          
@@ -119,6 +120,30 @@ public class SudokuDBManager implements SudokuGameDAO {
         return results;
     }
     
+    /**
+     * Gets a list of all of the unique user names stored in the database
+     * @return An ArrayList containing all of the unique user names stored in the database
+     */
+    public ArrayList<String> getUserNames() {
+        ArrayList<String> names = new ArrayList<>();
+        
+        try {
+            //Create the SQL statement
+            PreparedStatement sql = dbConnection.prepareStatement("SELECT DISTINCT PlayerName FROM " + TABLE_NAME);
+            ResultSet query = sql.executeQuery();
+            
+            //Process the results to get all of the player names
+            while(query.next()) {
+                String name = query.getString("PlayerName");
+                names.add(name);
+            }
+            
+        } catch(SQLException SE) {
+            System.out.println("Failed to retrieve column PlayerName from the database");
+        }
+        
+        return names;
+    }
     
     /**
      * Retrieves a game from the database according to its UID

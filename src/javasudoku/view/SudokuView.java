@@ -36,10 +36,13 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
         quitButton = new javax.swing.JButton();
         newGameButton = new javax.swing.JButton();
         loadGameButton = new javax.swing.JButton();
+        newUserButton = new javax.swing.JButton();
+        helpButton = new javax.swing.JButton();
         playerName = new javax.swing.JLabel();
         errorLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Java Sudoku");
         setBackground(javax.swing.UIManager.getDefaults().getColor("Actions.Grey"));
         setForeground(java.awt.Color.white);
         setMinimumSize(new java.awt.Dimension(630, 535));
@@ -51,7 +54,10 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
 
         showSolButton.setText("Show Solution");
 
-        changeUserButton.setText("Change User");
+        changeUserButton.setText("Select User");
+        changeUserButton.setMaximumSize(new java.awt.Dimension(106, 22));
+        changeUserButton.setMinimumSize(new java.awt.Dimension(106, 22));
+        changeUserButton.setPreferredSize(new java.awt.Dimension(106, 22));
 
         quitButton.setBackground(new java.awt.Color(255, 153, 153));
         quitButton.setForeground(new java.awt.Color(0, 0, 0));
@@ -63,19 +69,28 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
 
         loadGameButton.setText("Load Game");
 
+        newUserButton.setText("New User");
+        newUserButton.setMaximumSize(new java.awt.Dimension(106, 22));
+        newUserButton.setMinimumSize(new java.awt.Dimension(106, 22));
+        newUserButton.setPreferredSize(new java.awt.Dimension(106, 22));
+
+        helpButton.setText("Help");
+
         javax.swing.GroupLayout optionsPanelLayout = new javax.swing.GroupLayout(optionsPanel);
         optionsPanel.setLayout(optionsPanelLayout);
         optionsPanelLayout.setHorizontalGroup(
             optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(optionsPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(loadGameButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(changeUserButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(showSolButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(newGameButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addGroup(optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(helpButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(loadGameButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(newGameButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(showSolButton, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                    .addComponent(changeUserButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(newUserButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(quitButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(6, 6, 6))
+                .addContainerGap())
         );
         optionsPanelLayout.setVerticalGroup(
             optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -88,7 +103,11 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
                 .addComponent(showSolButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(changeUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 214, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(newUserButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 124, Short.MAX_VALUE)
+                .addComponent(helpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(quitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -104,7 +123,7 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(playerName)
@@ -137,8 +156,10 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton changeUserButton;
     public javax.swing.JLabel errorLabel;
+    public javax.swing.JButton helpButton;
     public javax.swing.JButton loadGameButton;
     public javax.swing.JButton newGameButton;
+    public javax.swing.JButton newUserButton;
     private javax.swing.JPanel optionsPanel;
     public javax.swing.JLabel playerName;
     public javax.swing.JButton quitButton;
@@ -160,6 +181,14 @@ public class SudokuView extends javax.swing.JFrame implements Observer {
      */
     public void activateBoard(boolean activated) {
         sudokuBoardPanel.setActive(activated);
+    }
+    
+    /**
+     * Resets all of the cells' text colours to black to indicate a valid board state
+     * when a new game is started
+     */
+    public void setValid() {
+        sudokuBoardPanel.setValid();
     }
     
     @Override

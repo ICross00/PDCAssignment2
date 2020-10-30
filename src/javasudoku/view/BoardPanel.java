@@ -177,4 +177,13 @@ public class BoardPanel extends javax.swing.JPanel {
         for(SubgridPanel subgrid: subgrids)
             subgrid.setActive(active);
     }
+
+    /**
+     * Resets the text colour for all of the cells in the board to clear
+     * invalid placements
+     */
+    void setValid() {
+        for(SubgridPanel subgrid: subgrids)
+            subgrid.setValid();
+    }
 }
