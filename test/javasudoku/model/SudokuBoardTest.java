@@ -1,4 +1,4 @@
-package javasudoku.tests;
+package javasudoku.model;
 import java.util.ArrayList;
 import org.junit.Test;
 import javasudoku.model.*;
@@ -226,7 +226,7 @@ public class SudokuBoardTest {
      * there are no empty cells
      */
    @Test
-   public void sudokuBoard_gewtEmptyCell_NoEmptyCellsReturnsNull() {
+   public void sudokuBoard_getEmptyCell_NoEmptyCellsReturnsNull() {
         //Create a SudokuSolver and solve the board
         SudokuSolver testSolver = new SudokuSolver();
         testSolver.solveBoard(board);

@@ -7,9 +7,6 @@ import javasudoku.dbaccess.SudokuDBManager;
 import javasudoku.model.SudokuModel;
 import javasudoku.view.SudokuView;
 import javax.swing.UIManager;
-import org.junit.internal.TextListener;
-import org.junit.runner.JUnitCore;
-
 
 /**
  * Entry point for the JavaSudoku program
@@ -18,8 +15,6 @@ import org.junit.runner.JUnitCore;
 public class SudokuApp {
 
     public static void main(String[] args) {
-        //Run the unit tests
-        runUnitTests();
         
         //Set the look and feel
         try { 
@@ -44,14 +39,5 @@ public class SudokuApp {
               SudokuDBManager.getInstance().closeConnection();
           }
        });
-    }
-    
-    /**
-     * Run the unit tests provided in javasudoku.tests.SudokuBoardTest
-     */
-    public static void runUnitTests() {
-        JUnitCore junit = new JUnitCore();
-        junit.addListener(new TextListener(System.out));
-        junit.run(javasudoku.tests.SudokuBoardTest.class);
     }
 }
