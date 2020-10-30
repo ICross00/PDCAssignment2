@@ -124,7 +124,8 @@ public class SudokuDBManager implements SudokuGameDAO {
      * Gets a list of all of the unique user names stored in the database
      * @return An ArrayList containing all of the unique user names stored in the database
      */
-    public ArrayList<String> getUserNames() {
+    @Override
+    public ArrayList<String> getPlayerNames() {
         ArrayList<String> names = new ArrayList<>();
         
         try {
@@ -201,6 +202,7 @@ public class SudokuDBManager implements SudokuGameDAO {
             
             //Iterate over all of the results
             while(query.next()) {
+                Integer gameID = query.getInt("UID");
                 String saveDate = query.getString("SaveDate");
                 String playerName = query.getString("PlayerName");
                 String boardData = query.getString("GameData");
@@ -208,6 +210,7 @@ public class SudokuDBManager implements SudokuGameDAO {
                 //Create the object by parsing the raw board data and setting the date manually
                 SudokuGame resultGame = new SudokuGame(playerName, SudokuStringifier.parseBoard(boardData));
                 resultGame.setDate(saveDate);
+                resultGame.setGameID(gameID);
                 
                 //Add the result to the arraylist
                 results.add(resultGame);
@@ -234,9 +237,10 @@ public class SudokuDBManager implements SudokuGameDAO {
 
         //Create the SQL statement
         try {
+ 
             PreparedStatement sql = dbConnection.prepareStatement(
-                    "INSERT INTO " + TABLE_NAME + " (SaveDate, FilledCells, PlayerName, GameData) VALUES ("
-                            + "?,?,?,?)");
+                "INSERT INTO " + TABLE_NAME + " (SaveDate, FilledCells, PlayerName, GameData) VALUES ("
+                        + "?,?,?,?)");
 
             //Append the parameters
             sql.setString(1, dateAsString);
@@ -261,7 +265,7 @@ public class SudokuDBManager implements SudokuGameDAO {
         try {
             //Create the SQL statement
             PreparedStatement sql = dbConnection.prepareStatement(
-                    "REMOVE FROM " + TABLE_NAME + " WHERE UID = ?");
+                    "DELETE FROM " + TABLE_NAME + " WHERE UID = ?");
             sql.setInt(1, id);
 
             sql.executeUpdate();
@@ -269,12 +273,5 @@ public class SudokuDBManager implements SudokuGameDAO {
             System.out.println("Failed to remove game with UID " + id);
             System.out.println(se);
         }
-    }
-
-    @Override
-    public void updateGame(int id, SudokuGame newBoard) {
-        //Remove the game with the existing ID, then add the new game
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Fri Oct 30 17:15:11 NZDT 2020:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0175-77b7-6f6f-00001e0afad8 
-on database directory C:\Users\Admin\Desktop\JavaProjects\JavaSudokuGUI\SudokuDB with class loader sun.misc.Launcher$AppClassLoader@70dea4e 
+Fri Oct 30 21:58:57 NZDT 2020:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0175-78bb-3879-00001db725f8 
+on database directory C:\Users\Admin\Desktop\JavaProjects\JavaSudokuGUI\SudokuDB with class loader sun.misc.Launcher$AppClassLoader@33909752 
 Loaded from file:/C:/Users/Admin/Desktop/JavaProjects/JavaSudokuGUI/lib/derby.jar
 java.vendor=AdoptOpenJDK
 java.runtime.version=1.8.0_262-b10

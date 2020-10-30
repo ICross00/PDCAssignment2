@@ -34,7 +34,7 @@ public class CellPanel extends javax.swing.JPanel {
      * Initializes the format handler for when text is entered
      */
     private void initTextFormatHandler() {
-        cellValueText.setDocument(new SudokuFormatDocument());
+        cellValueText.setDocument(new CellFormatDocument());
         setFocusTraversalKeysEnabled(false); //Prevent tabbing across cells
     }
     /**
@@ -124,7 +124,7 @@ public class CellPanel extends javax.swing.JPanel {
      * to ensure that only one numerical character
      * can be entered into the cell
      */
-    private class SudokuFormatDocument extends PlainDocument {
+    private class CellFormatDocument extends PlainDocument {
         private static final int MAX_CHARS = 1;
         
         @Override

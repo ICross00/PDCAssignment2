@@ -150,7 +150,7 @@ public class SudokuBoard {
      * @param position The position to retrieve SudokuCollections from
      * @return All of the SudokuCollection objects in the collections arraylist that contain this coordinate
      */
-    private ArrayList<SudokuCollection> getCollectionsAt(SudokuCoordinate position) {
+    public ArrayList<SudokuCollection> getCollectionsAt(SudokuCoordinate position) {
         
         ArrayList<SudokuCollection> contains = new ArrayList<>();
         for(SudokuCollection collection: collections) {

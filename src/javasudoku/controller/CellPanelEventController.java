@@ -112,7 +112,7 @@ class CellPanelEventController implements AWTEventListener, SimpleDocumentListen
 
         SudokuBoard modelBoard = model.getBoard();
         //If the text was removed, remove the cell and do nothing
-        if(cellText.isEmpty()) {
+        if(cellText.isEmpty()) {    
             modelBoard.setCell(selectedCoord, 0);
         } else {
             try {

@@ -13,19 +13,6 @@ import javasudoku.view.ListOptionDialog;
 import javax.swing.JOptionPane;
 
 /**
- * TODO: Implement a dialog that allows the user to either enter a new user name,
- * or select from a list of existing players using the get player names method in 
- * SudokuDBManager
- * 
- * TODO:
- * Make the request change user button display this list and get the option from the user's selection
- * Add a 'new user' button that prompts the user to enter their name
- * Add a help button
- * Describe MVC implementation in a document
- * Create unit tests
- */
-
-/**
  * Connects a SudokuModel and SudokuView instance
  * @author Ishaiah Cross
  */
@@ -34,6 +21,7 @@ public class SudokuController {
     private final SudokuView view;
     private CellPanelEventController boardInputListener;
     private boolean enableSaving;
+    private Integer activeGameDB_ID; //The ID of the active game in the database
     
     public SudokuController(SudokuModel model, SudokuView view) {   
         this.model = model;
@@ -41,6 +29,8 @@ public class SudokuController {
         
         //Disable the text inputs on the board until a game has been started
         view.sudokuBoardPanel.setActive(false);
+        //Set the active game ID to null. When a game is loaded, this field is initialized
+        this.activeGameDB_ID = null;
     }
     
     /**
@@ -53,19 +43,20 @@ public class SudokuController {
         
         //New Game button clicked
         view.newGameButton.addActionListener((ActionEvent e) -> {
-            view.setValid(); //Clear away any red (invalid) cells, as a new game will not have any
             requestStartNewGame();
         });
         
         //Load Game button clicked
-        view.loadGameButton.addActionListener((ActionEvent e) -> {
-            view.setValid(); //Clear away any red (invalid) cells, as a loaded game will not have any
+        view.loadGameButton.addActionListener((ActionEvent e) -> {   
             requestLoadGame();
         });
         
         //Quit Game button clicked
         view.quitButton.addActionListener((ActionEvent e) -> {
-            requestSaveGame();
+             //If there is a game in progress, prompt the user to save
+            if(!model.isBoardEmpty())
+                requestSaveGame();
+            
             view.setVisible(false);
             view.dispose();
         });
@@ -84,6 +75,10 @@ public class SudokuController {
         //New User button clicked
         view.newUserButton.addActionListener((ActionEvent e) -> { 
             requestNewUser();
+        });
+        
+        view.helpButton.addActionListener((ActionEvent e) -> { 
+            requestShowHelp();
         });
         
         //Set up listener for when cell values are changed or clicked on
@@ -138,7 +133,7 @@ public class SudokuController {
      */
     private void requestChangeUser() {
         //Get the unique user names from the database
-        ArrayList<String> userOptions = SudokuDBManager.getInstance().getUserNames();
+        ArrayList<String> userOptions = SudokuDBManager.getInstance().getPlayerNames();
         
         if(userOptions.isEmpty()) {
             //If there were no users, prompt the user to create a new one and exit
@@ -189,6 +184,12 @@ public class SudokuController {
         if(save) {
             //Use the database manager to save the game to the database
             SudokuDBManager dbaccess = SudokuDBManager.getInstance();
+            
+            //If the game's ID already exists in the database, remove it so it can be updated
+            if(this.activeGameDB_ID != null)
+                dbaccess.removeGame(this.activeGameDB_ID);
+                
+            //Add the game to the database
             dbaccess.addGame(model.exportGame());
         }
         
@@ -257,6 +258,7 @@ public class SudokuController {
         
         //Re-enable saving
         this.enableSaving = true;
+        view.setValid(); //Clear away any red (invalid) cells, as a new game will not have any
     }
     
     /**
@@ -308,6 +310,32 @@ public class SudokuController {
             
             //Re-enable saving
             this.enableSaving = true;
+            
+            //Track the ID so that the database record can be updated later
+            this.activeGameDB_ID = selectedGame.getGameID();
+            view.setValid(); //Clear away any red (invalid) cells, as a loaded game will not have any
         }
     }
+    
+    /**
+     * Displays a dialog containing instructions for the user on how to
+     * operate the interface
+     */
+    private void requestShowHelp() {
+        JOptionPane.showMessageDialog(null, "The goal of Sudoku is to fill every row, column, and 3x3 subgrid on the board with"
+                + "the numbers 1-9. No repeated numbers are allowed.\n To start a game, first choose a user from the 'Select User' menu "
+                + "or create a new user using the 'New User' button.\n Then, either load an existing game using the 'Load Game' button or create a new game "
+                + "using the 'New Game' button.\n\n"
+                + ""
+                + "Once started, simply click on a cell to enter a digit from 1-9. If the digit placement was not valid, the cell will be highlighted in red.\n"
+                + "To undo a placement, simply remove the text from the cell.\n"
+                + "You will be prompted to save your game if you quit, start a new game, load a new game, or change users.\n You can then "
+                + "access your game later through the 'Load Game' option, and your progress will be saved.\n"
+                + "This will overwrite your previously saved progress."
+                + "\n"
+                + "If the solution for a puzzle is revealed, the option to save the puzzle will not be given.\n"
+                + "Warning: If the window is closed using the top-right X icon, the game will not be saved.", 
+                    "Instructions", JOptionPane.INFORMATION_MESSAGE);
+    }
+   
 }

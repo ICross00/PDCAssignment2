@@ -17,6 +17,8 @@ public final class SudokuGame {
     public String lastPlayedDate;
     public boolean isSolved;
     
+    private Integer gameID = null;
+    
     public SudokuGame(String playerName, SudokuBoard boardState) {
         this.playerName = playerName;
         this.boardState = boardState;
@@ -25,7 +27,25 @@ public final class SudokuGame {
         this.completionPercentage = ((float)getNumFilledCells()) / totalCells;
         
     }
-    
+
+    /**
+     * Gets the game ID, or null if no game ID has been set
+     * @return the gameID
+     */
+    public Integer getGameID() {
+        return gameID;
+    }
+
+    /**
+     * Sets the game ID. This should only be done
+     * after the game has been retrieved from a database to ensure the ID
+     * corresponds to a unique identifier in data storage
+     * @param gameID the gameID to set
+     */
+    public void setGameID(Integer gameID) {
+        this.gameID = gameID;
+    }
+   
     /**
      * Saves the current date to the object
      */
